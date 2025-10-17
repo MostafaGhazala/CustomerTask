@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using CustomerTask.Core.Entites
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-3">Login</h3>
+
+                <form asp-action="Login" method="post">
+                    <div class="mb-3">
+                        <label name="Email" class="form-label">Email</label>
+                        <input name="Email" type="email" class="form-control" required />
+                        @* <span asp-validation-for="Email" class="text-danger"></span> *@
+                    </div>
+                    <div class="mb-3">
+                        <label name="Password" class="form-label">Password</label>
+                        <input name="Password" type="password" class="form-control" required />
+                        @* <span asp-validation-for="Password" class="text-danger"></span> *@
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a asp-action="Register">Don't have an account? Register</a>
+                </div>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger mt-2">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <p>@error.ErrorMessage</p>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

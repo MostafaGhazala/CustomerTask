@@ -1,0 +1,22 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using CustomerTask.Core.Entites
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Page Not Found";
+    bool isLoggedIn = SignInManager.IsSignedIn(User);
+}
+
+<div class="container text-center mt-5">
+    <h1 class="display-4 text-warning">404 - Page Not Found</h1>
+    <p class="lead">Sorry, the page you’re looking for doesn’t exist.</p>
+
+    @if (isLoggedIn)
+    {
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">🏠 Back to Home</a>
+    }
+    else
+    {
+        <a asp-controller="Account" asp-action="Login" class="btn btn-primary mt-3">🔐 Go to Login</a>
+    }
+</div>

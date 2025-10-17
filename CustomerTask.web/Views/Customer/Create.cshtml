@@ -1,0 +1,175 @@
+﻿@model CustomerTask.Core.Dtos.CustomerDto
+@{
+    var isEdit = Model.Id != 0;
+    ViewBag.Title = isEdit ? "Edit Customer" : "Create Customer";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form asp-action="@(isEdit ? "Edit" : "Create")" method="post">
+    @if (isEdit)
+    {
+        <input type="hidden" asp-for="Id" />
+    }
+
+    @* <div asp-validation-summary="All" class="text-danger"></div> *@
+
+    <!-- Full Name -->
+    <div class="form-group">
+        <label asp-for="FullName"></label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <!-- National ID -->
+    <div class="form-group">
+        <label asp-for="NationalID"></label>
+        <input asp-for="NationalID" maxlength="14" class="form-control" />
+        <span asp-validation-for="NationalID" class="text-danger"></span>
+    </div>
+
+    <!-- Birth Date (readonly) -->
+    <div class="form-group">
+        <label asp-for="BirthDate"></label>
+        <input asp-for="BirthDate" type="date" class="form-control" readonly />
+        <span asp-validation-for="BirthDate" class="text-danger"></span>
+    </div>
+
+    <!-- Gender -->
+    <div class="form-group">
+        <label asp-for="GenderId"></label>
+        <select asp-for="GenderId" class="form-control" asp-items="@(new SelectList(Model.Genders, "Id", "Name"))">
+            <option value="">Select Gender</option>
+        </select>
+        <span asp-validation-for="GenderId" class="text-danger"></span>
+    </div>
+
+    <!-- Governorate -->
+    <div class="form-group">
+        <label asp-for="GovernorateId"></label>
+        <select id="GovernorateId" asp-for="GovernorateId" class="form-control">
+            <option value="">Select Governorate</option>
+            @foreach (var g in Model.Governorates)
+            {
+                <option value="@g.Id">@g.Name</option>
+            }
+        </select>
+        <span asp-validation-for="GovernorateId" class="text-danger"></span>
+    </div>
+
+    <!-- District -->
+    <div class="form-group">
+        <label asp-for="DistrictId"></label>
+        <select id="DistrictId" asp-for="DistrictId" class="form-control">
+            <option value="">Select District</option>
+        </select>
+        <span asp-validation-for="DistrictId" class="text-danger"></span>
+    </div>
+
+    <!-- Village -->
+    <div class="form-group">
+        <label asp-for="VillageId"></label>
+        <select id="VillageId" asp-for="VillageId" class="form-control">
+            <option value="">Select Village</option>
+        </select>
+        <span asp-validation-for="VillageId" class="text-danger"></span>
+    </div>
+
+    <!-- Salary -->
+    <div class="form-group">
+        <label asp-for="Salary"></label>
+        <input asp-for="Salary" class="form-control" />
+        <span asp-validation-for="Salary" class="text-danger"></span>
+    </div>
+
+    <!-- Age (readonly) -->
+    <div class="form-group">
+        <label asp-for="Age"></label>
+        <input asp-for="Age" class="form-control" readonly />
+        <span asp-validation-for="Age" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">@(isEdit ? "Update" : "Save")</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <!-- jQuery Validation -->
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // --- Populate dependent dropdowns ---
+        var districts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Districts));
+        var villages = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Villages));
+
+        function populateDistricts(governorateId, selectedDistrictId = null) {
+            $('#DistrictId').empty().append('<option value="">Select District</option>');
+            $('#VillageId').empty().append('<option value="">Select Village</option>');
+
+            districts.filter(d => d.ParentId == governorateId)
+                     .forEach(d => {
+                         var selected = d.Id == selectedDistrictId ? "selected" : "";
+                         $('#DistrictId').append(`<option value="${d.Id}" ${selected}>${d.Name}</option>`);
+                     });
+        }
+
+        function populateVillages(districtId, selectedVillageId = null) {
+            $('#VillageId').empty().append('<option value="">Select Village</option>');
+            villages.filter(v => v.ParentId == districtId)
+                    .forEach(v => {
+                        var selected = v.Id == selectedVillageId ? "selected" : "";
+                        $('#VillageId').append(`<option value="${v.Id}" ${selected}>${v.Name}</option>`);
+                    });
+        }
+
+        $(document).ready(function () {
+            // Pre-fill dropdowns on edit
+            if ($('#GovernorateId').val()) {
+                populateDistricts($('#GovernorateId').val(), @Model.DistrictId);
+                if (@Model.DistrictId != 0) {
+                    populateVillages(@Model.DistrictId, @Model.VillageId);
+                }
+            }
+
+            $('#GovernorateId').change(function () {
+                populateDistricts($(this).val());
+            });
+
+            $('#DistrictId').change(function () {
+                populateVillages($(this).val());
+            });
+        });
+
+        // --- Calculate BirthDate & Age from National ID ---
+        function calculateFromNationalId(nid) {
+            if (nid.length !== 14) return { birthDate: "", age: "" };
+
+            let centuryCode = parseInt(nid.substring(0, 1));
+            let year = parseInt(nid.substring(1, 3));
+            let month = parseInt(nid.substring(3, 5));
+            let day = parseInt(nid.substring(5, 7));
+
+            let fullYear = (centuryCode === 2 ? 1900 : 2000) + year;
+            let birthDate = new Date(fullYear, month - 1, day);
+
+            if (isNaN(birthDate)) return { birthDate: "", age: "" };
+
+            let today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            let m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+
+            return {
+                birthDate: birthDate.toISOString().split("T")[0],
+                age: age
+            };
+        }
+
+        $("#NationalID").on("input", function () {
+            let nid = $(this).val();
+            let result = calculateFromNationalId(nid);
+            $("#BirthDate").val(result.birthDate);
+            $("#Age").val(result.age);
+        });
+    </script>
+}
