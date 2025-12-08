@@ -14,6 +14,8 @@ namespace CustomerTask.Core.Interfaces
         IGenericRepository<District> Districts { get; }
         IGenericRepository<Village> Villages { get; }
         IGenericRepository<Gender> Genders { get; }
+        IGenericRepository<Numbers> Numbers  { get; }
+        IGenericRepository<ReservedNumbers> ReservedNumbers { get; }
 
         Task<int> SaveAsync();
     }

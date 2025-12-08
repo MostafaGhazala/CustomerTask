@@ -19,6 +19,8 @@ namespace CustomerTask.Infrastructure.UnitOfWork
         public IGenericRepository<District> Districts { get; }
         public IGenericRepository<Village> Villages { get; }
         public IGenericRepository<Gender> Genders { get; }
+        public IGenericRepository<Numbers> Numbers{ get; }
+        public IGenericRepository<ReservedNumbers> ReservedNumbers { get; }
 
         public UnitOfWork(ApplicationDbContext context)
         {
@@ -28,6 +30,8 @@ namespace CustomerTask.Infrastructure.UnitOfWork
             Districts = new GenericRepository<District>(_context);
             Villages = new GenericRepository<Village>(_context);
             Genders = new GenericRepository<Gender>(_context);
+            Numbers = new GenericRepository<Numbers>(_context);
+            ReservedNumbers = new GenericRepository<ReservedNumbers>(_context);
         }
 
         public async Task<int> SaveAsync() => await _context.SaveChangesAsync();

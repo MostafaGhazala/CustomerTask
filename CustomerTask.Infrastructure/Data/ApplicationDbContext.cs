@@ -16,6 +16,8 @@ namespace CustomerTask.Infrastructure.Data
         public DbSet<District> Districts { get; set; }
         public DbSet<Village> Villages { get; set; }
         public DbSet<Gender> Genders { get; set; }
+        public DbSet<Numbers> Numbers{ get; set; }
+        public DbSet<ReservedNumbers> ReservedNumbers{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

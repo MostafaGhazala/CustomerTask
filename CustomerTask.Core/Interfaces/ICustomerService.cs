@@ -15,5 +15,6 @@ namespace CustomerTask.Core.Interfaces
         Task<int> CreateCustomerAsync(CustomerDto model);
         Task UpdateCustomerAsync(CustomerDto model);
         Task<int> DeleteCustomerAsync(int id);
+        Task TakeNumberAsync();
     }
 }

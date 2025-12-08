@@ -80,5 +80,48 @@ namespace CustomerTask.Services.Services
             }
             return -1;
         }
+        public async Task TakeNumberAsync()
+        {
+            //get all Numbers 
+            /*
+              1- get bigger number from numbers and not reserved 
+              2- get all reserved numbers which are greater than bigger number
+              3- if there is no reserved number greater than bigger number then insert bigger number +1
+              4- will use search binary with sorted reserved numbers to get the first reserved number greater than bigger number and not reserved
+              5-  
+             */
+              //1
+                //var biggerNumber = await _unitOfWork.Numbers.GetBiggerNumber();
+
+
+            var allNumbers = await _unitOfWork.Numbers.GetAllAsync();
+            //get all Reserved Numbers
+            var reservedNumbers =  _unitOfWork.ReservedNumbers.GetAllAsync().Result.OrderBy(x=>x.ReservedNumber).Select(x=>x.ReservedNumber).ToList();
+            //i want to insert number last number biggest number in numbers and the same time not one of reserved number 
+            // Binary search 
+           
+           
+            
+        }
+        public static int BinarySearch(List<int> numbers, int target)
+        {
+            int left = 0;
+            int right = numbers.Count - 1;
+
+            while (left <= right)
+            {
+                int mid = left + (right - left) / 2;
+
+                if (numbers[mid] == target)
+                    return mid;           
+
+                if (numbers[mid] < target)
+                    left = mid + 1;       
+                else
+                    right = mid - 1;      
+            }
+
+            return -1; 
+        }
     }
 }

@@ -3,7 +3,7 @@ using CustomerTask.Core.Dtos;
 using CustomerTask.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-[Authorize(Roles = "Admin")]
+//[Authorize(Roles = "Admin")]
 public class CustomerController : Controller
 {
     private readonly ICustomerService _customerService;
@@ -14,7 +14,7 @@ public class CustomerController : Controller
     }
 
     // GET: Customer/Index
-    [Authorize]
+    //[Authorize]
 
     public async Task<ActionResult> Index()
     {
@@ -24,7 +24,7 @@ public class CustomerController : Controller
     }
 
     // GET: Customer/Create
-    [Authorize]
+    //[Authorize]
 
     public async Task<ActionResult> Create()
     {
@@ -52,6 +52,13 @@ public class CustomerController : Controller
         model.Genders = reloadedModel.Genders;
 
         return View(model);
+    }// POST: Customer/TakeNumber
+  
+
+    public async Task TakeNumber()
+    {
+        //get all numbers
+        await _customerService.TakeNumberAsync();
     }
 
     // GET: Customer/Edit/5
