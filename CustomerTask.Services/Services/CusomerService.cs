@@ -90,18 +90,34 @@ namespace CustomerTask.Services.Services
               4- will use search binary with sorted reserved numbers to get the first reserved number greater than bigger number and not reserved
               5-  
              */
-              //1
-                //var biggerNumber = await _unitOfWork.Numbers.GetBiggerNumber();
+            //1
+            var biggerNumber = await _unitOfWork.Numbers.GetBiggestNumber();
 
+            //2
+            var reservedNumbers =  _unitOfWork.ReservedNumbers.GetAllAsQuery(x=>x.ReservedNumber>biggerNumber)
+                                    .OrderBy(x=>x.ReservedNumber).Select(x=>x.ReservedNumber).ToHashSet();
+            //3
+                var newNumber = new Numbers();
+                newNumber.Number = biggerNumber + 1;
+            if (reservedNumbers.Count != 0)
+            {
+                var res = reservedNumbers.Contains(newNumber.Number);
+                while (res)
+                {
+                    newNumber.Number += 1;
+                    res = reservedNumbers.Contains(newNumber.Number);
+                }
+            } 
+            
+            await _unitOfWork.Numbers.AddAsync(newNumber);
+            await _unitOfWork.SaveAsync();
+            return;
 
-            var allNumbers = await _unitOfWork.Numbers.GetAllAsync();
-            //get all Reserved Numbers
-            var reservedNumbers =  _unitOfWork.ReservedNumbers.GetAllAsync().Result.OrderBy(x=>x.ReservedNumber).Select(x=>x.ReservedNumber).ToList();
             //i want to insert number last number biggest number in numbers and the same time not one of reserved number 
             // Binary search 
-           
-           
-            
+
+
+
         }
         public static int BinarySearch(List<int> numbers, int target)
         {

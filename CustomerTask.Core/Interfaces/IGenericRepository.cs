@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using CustomerTask.Core.Entites;
 
 namespace CustomerTask.Core.Interfaces
 {
@@ -14,6 +15,9 @@ namespace CustomerTask.Core.Interfaces
         Task AddAsync(T entity);
         void Update(T entity);
         void Delete(T entity);
-        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+        IQueryable<T> GetAllAsQuery(Expression<Func<T, bool>> predicate);
+
+        Task<int> GetBiggestNumber();
+
     }
 }

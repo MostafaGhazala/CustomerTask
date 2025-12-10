@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using CustomerTask.Core.Entites;
 using CustomerTask.Core.Interfaces;
 using CustomerTask.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -43,8 +44,26 @@ namespace CustomerTask.Infrastructure.Repositories
         public void Update(T entity) => _context.Set<T>().Update(entity);
 
         public void Delete(T entity) => _context.Set<T>().Remove(entity);
+        public async Task<int> GetBiggestNumber() {
 
-        public IQueryable<T> FindAsync(Expression<Func<T, bool>> predicate)
-            => _context.Set<T>().Where(predicate).AsQueryable();
+            var sql = @"
+                 SELECT TOP 1 n.Number
+                FROM Numbers n
+                 left JOIN ReservedNumbers r 
+                    ON n.Number = r.ReservedNumber
+                WHERE r.ReservedNumber IS NULL
+                ORDER BY n.Number DESC";
+
+           return await _context.Numbers
+                .FromSqlRaw(sql)
+                .Select(n => n.Number)
+                .FirstOrDefaultAsync();
+
+        }
+
+        public IQueryable<T> GetAllAsQuery(Expression<Func<T, bool>> predicate)
+        {
+            return _context.Set<T>().Where(predicate);
+        }
     }
 }
